@@ -21,7 +21,7 @@ for j, row in enumerate(reader):
     c.executemany('''INSERT INTO Londontweet11056test(tweetid , lon, lat, tweettxt, created,retweet_count, retweeted,userid,userlang, screen_name) values(?,?,?,?,?,?,?,?,?,?)''',lst)
     conn.commit()
     lst=[] #resets the list
-  elif j==len(stored)
+  elif j==len(stored):
     c.executemany('''INSERT INTO Londontweet11056test(tweetid , lon, lat, tweettxt, created,retweet_count, retweeted,userid,userlang, screen_name) values(?,?,?,?,?,?,?,?,?,?)''',lst)
     conn.commit()
 conn.close()
