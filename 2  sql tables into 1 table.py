@@ -6,6 +6,7 @@ from collections import defaultdict
 from glob import glob; from os.path import expanduser
 
 #This code takes two sql tables in separate databases and merges them in a new sql database in a single table
+#The data is Tweet data
 
 ###########################################################################################################################################################
 #1.Create a new database that the data will be written to
