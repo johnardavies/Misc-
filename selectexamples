@@ -1,0 +1,41 @@
+library("RODBC")
+library('sqldf')
+library('rgdal')
+
+#This code shows a series of example sql selection commands implemented in R
+
+#1. Extracts the culture24 data from the datbase
+
+#filepath to the database
+dbfile<-"filepath\\epatculture25.db"
+
+# Instantiate the dbDriver to a convenient object
+sqlite = dbDriver("SQLite");
+
+# Assign the connection string to a connection object
+mydb = dbConnect(sqlite, dbfile);
+
+#Lists the tables associated with the database
+dbListTables(mydb)
+
+#Reads in the table as a data frame, calls it p1
+
+p1 = dbGetQuery(mydb,'select * from culture24venues170616')
+
+#selects all rows and all columns (the * operator) from the table culture24venues170616  where the value of the country column in England
+p2=dbGetQuery(mydb,'SELECT * FROM culture24venues170616 WHERE country="England"')
+
+#selects a column (the names column) for all countries where the country column says England
+p2=dbGetQuery(mydb,'SELECT names FROM culture24venues170616 WHERE country="England"')
+
+#As previous command, but this command only returns 10 rows
+p2=dbGetQuery(mydb,'SELECT names FROM culture24venues170616 WHERE country="England" Limit 10')
+
+#selects all rows from the table culture24venues170616 where the types column contains the value Museum somewhere
+p2=dbGetQuery(mydb,'SELECT * FROM culture24venues170616 WHERE types LIKE "%Museum%"')
+
+#selects all rows from the table culture24venues170616 where the types column contains the value Museum AND the value Gallery somewhere
+p2=dbGetQuery(mydb,'SELECT * FROM culture24venues170616 WHERE types LIKE "%Museum%" AND types LIKE "%Gallery%"')
+
+#selects all rows from the table culture24venues170616 where the types column contains the value Museum OR the value Gallery somewhere
+p2=dbGetQuery(mydb,'SELECT * FROM culture24venues170616 WHERE types LIKE "%Museum%" OR types LIKE "%Gallery%"')
