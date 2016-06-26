@@ -9,7 +9,7 @@ library('rgdal')
 #filepath to the database
 dbfile<-"filepath\\epatculture25.db"
 
-# Instantiate the dbDriver to a convenient object
+# the dbDriver is labelled sqlite
 sqlite = dbDriver("SQLite");
 
 # Assign the connection string to a connection object
