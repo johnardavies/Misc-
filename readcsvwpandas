@@ -1,0 +1,19 @@
+#insert the artists data into the database
+import sqlite3
+import pandas as pd
+
+# load data into pandas
+df = pd.read_csv('filepath\Paintings\\all_data_info.csv')
+
+# strip whitespace from headers
+df.columns = df.columns.str.strip()
+
+con = sqlite3.connect(filepath\\test\\imagesearchart100817v2.db")
+
+#sorts oyut any
+con.text_factory = lambda x: unicode(x, 'utf-8', 'ignore') 
+
+# drop data into database in table paintinginfo
+df.to_sql("paintinginfo", con)
+
+con.close()
