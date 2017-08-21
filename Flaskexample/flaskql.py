@@ -3,14 +3,16 @@ from flask import Flask, render_template, request
 import sqlite3 as sql
 app = Flask(__name__)
 
+#The page that gets loaded at the beinning
 @app.route('/')
 def home():
    return render_template('home.html')
-
+#This loads the data input form if the hyperlink /enternew is clicked on in home
 @app.route('/enternew')
 def new_student():
    return render_template('student.html')
 
+#This takes the input from the form and writes it to the database table called student
 @app.route('/addrec',methods = ['POST', 'GET'])
 def addrec():
    if request.method == 'POST':
@@ -33,7 +35,7 @@ def addrec():
       finally:
          return render_template("result.html",msg = msg)
          con.close()
-
+#This returns the results of the data inputs using list.html
 @app.route('/list')
 def list():
    con = sql.connect("database.db")
