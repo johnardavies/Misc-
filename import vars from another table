@@ -1,0 +1,62 @@
+from sqlite3 import dbapi2 as sqlite
+
+
+#This code pulls in a set of variables from one table to another based on both tables having a common column
+#quite slow
+
+conn = sqlite.connect('filepath\test\\databasea.db')
+
+c=conn.cursor()
+
+#The SQL starts within the triple quote
+script=''' 
+
+/*Attaches both databases so we can refer to them *?
+ATTACH "filepath\\test\\databasea.db" As DbA;
+ATTACH "filepath\\test\\databaseb.db" As DbB;
+
+/*The imlist table in DbA is going to be update  */
+UPDATE DbA.imlist 
+/*The set command updates the variables which appear below it. They need to be pre-existing in DbA.imlist */
+SET
+/*Pulls in the variables based on the new_filename being the same */
+   artist = (SELECT DbB.paintinginfo.artist
+                            FROM DbB.paintinginfo
+                            WHERE DbA.imlist.new_filename = DbB.paintinginfo.new_filename)  ,
+    genre = (SELECT  DbB.paintinginfo.genre
+                            FROM DbB.paintinginfo
+                            WHERE DbA.imlist.new_filename = DbB.paintinginfo.new_filename )
+   , source = (SELECT   DbB.paintinginfo.source
+                            FROM DbB.paintinginfo
+                            WHERE DbA.imlist.new_filename = DbB.paintinginfo.new_filename  )
+    , style = (SELECT  DbB.paintinginfo.style 
+                            FROM DbB.paintinginfo
+                            WHERE DbA.imlist.new_filename = DbB.paintinginfo.new_filename  )
+     , title = (SELECT  DbB.paintinginfo.title
+                            FROM DbB.paintinginfo
+                            WHERE DbA.imlist.new_filename = DbB.paintinginfo.new_filename  )
+     , artist_group = (SELECT  DbB.paintinginfo.artist_group
+                            FROM DbB.paintinginfo
+                            WHERE DbA.imlist.new_filename = DbB.paintinginfo.new_filename  )
+    , datecat = (SELECT  DbB.paintinginfo.datecat
+                            FROM DbB.paintinginfo
+                            WHERE DbA.imlist.new_filename = DbB.paintinginfo.new_filename  )
+   , in_train = (SELECT  DbB.paintinginfo.in_train
+                            FROM DbB.paintinginfo
+                            WHERE DbA.imlist.new_filename = DbB.paintinginfo.new_filename  )
+                            
+                            
+WHERE
+    EXISTS (
+        SELECT *
+        FROM DbB.paintinginfo
+        WHERE DbA.imlist.new_filename = DbB.paintinginfo.new_filename
+    )
+    
+ '''
+
+c.executescript(script) 
+#executes the script above
+
+conn.close()
+
