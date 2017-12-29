@@ -8,7 +8,7 @@ c.execute('''ALTER TABLE imlist add column closestmatch40 char(50)''')
 origd="label"
 clo="variable value"
     
-#updates the closestmatch40 variable in table imlist with the result of the search conditional on the new filename being in this case "label"
+#updates the closestmatch40 variable in table imlist with the result of the search conditional on the new_filename column being in this case "label"
 c.execute(''' UPDATE imlist SET closestmatch40=? WHERE new_filename=?''', [clo, origd ])
 con.commit()
 
