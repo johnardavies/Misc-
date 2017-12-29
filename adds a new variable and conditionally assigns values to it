@@ -1,0 +1,15 @@
+ #Creates a new column variable, and then updates it conditional on something
+con = sqlite.connect(databasefilepath\\25112017.db')
+
+c=con.cursor()
+#Creates new variable closestmatch40 in table imlist
+c.execute('''ALTER TABLE imlist add column closestmatch40 char(50)''')
+
+origd="label"
+clo="variable value"
+    
+#updates the closestmatch40 variable in table imlist with the result of the search conditional on the new filename being in this case "label"
+c.execute(''' UPDATE imlist SET closestmatch40=? WHERE new_filename=?''', [clo, origd ])
+con.commit()
+
+con.close()
