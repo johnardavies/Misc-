@@ -11,7 +11,7 @@ c=conn.cursor()
 #The SQL starts within the triple quote
 script=''' 
 
-/*Attaches both databases so we can refer to them *?
+/*Attaches both databases so we can refer to them */
 ATTACH "filepath\\test\\databasea.db" As DbA;
 ATTACH "filepath\\test\\databaseb.db" As DbB;
 
