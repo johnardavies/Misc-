@@ -1,0 +1,14 @@
+import sqlite3
+import os
+connection = sqlite3.connect("filepath\\imagesearchart.db")
+cursor = connection.cursor()
+cursor.execute("SELECT filename FROM imlist;")
+#Gets all the results
+results = cursor.fetchall()
+#Loops through the results
+for r in results:
+    filenamed=str(os.path.basename(r[0]))
+    cursor.execute(''' UPDATE imlist SET new_filename=? WHERE filename=?''', [filenamed, r[0]])
+    connection.commit()
+cursor.close()
+connection.close()
