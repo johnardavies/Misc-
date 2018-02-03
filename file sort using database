@@ -1,0 +1,44 @@
+import sqlite3 as sqlite
+import os
+con = sqlite.connect('filepath to database location.db')
+
+cur=con.cursor() 
+
+#selects the distinct genres from the table
+a=con.execute('''SELECT DISTINCT genre FROM imlist''').fetchall()
+
+#counts the number of artworks by genre
+b=con.execute(''' SELECT genre, COUNT(*) AS numitems FROM imlist GROUP BY genre''').fetchall()
+
+#counts the genres that have more than 500 items
+c=con.execute(''' SELECT genre, COUNT(*) AS numitems FROM imlist GROUP BY genre HAVING COUNT(*)>500''').fetchall()
+
+#Path to the folder that the pictures will be written to
+path = r'filepath for destination folder'
+
+#Creates folders for each genre
+for elem in c:
+    print(elem[0])
+    newpath=path+str(elem[0])
+    if not os.path.exists(newpath):
+     os.makedirs(newpath)
+    
+#for each of the genres writes the pictures to the relevant folder    
+for elem in c:
+    #Gets a list of where the photos are saved from the genre table
+    d=con.execute('''SELECT filename FROM imlist where genre='%s' ''' % elem[0]).fetchall()
+    #For each genre loop through the associated photos and save them to the relevant folder
+    for elems in d:
+        #Creates the destination filepath
+        filename=os.path.basename(elems[0])
+        nam=os.path.splitext(filename)[0]
+        imdd=nam+'.jpg'
+        dst=path+str(elem[0])+'\\'+str(imdd)
+        #Copies the file from the old filepath to the new location using the filepath just created
+        copyfile(elems[0], dst)
+
+#Closes the database connection
+con.close()   
+    
+    
+    
