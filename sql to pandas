@@ -1,0 +1,31 @@
+import pyodbc
+%matplotlib inline 
+import pandas.io.sql as psql
+import sqlite3
+from PIL import Image
+from pylab import *
+
+con = sqlite3.connect(r'filepath\\Liverpoolanalysis080618.db')
+cur = con.cursor()
+#code = '''SELECT * FROM Liverpoolstreet ORDER by georgprob DESC ;''' #ASC
+code='''SELECT * FROM Liverpoolstreet WHERE georgprob > 0.9 AND georgprob < 1;'''
+df =psql.read_sql(code, con)
+
+#print(df.head)
+con.close()
+
+
+photoinfocut=df
+
+row_iterator = df.iterrows()
+for i, row in row_iterator:
+#len(photoinfocut)/100
+#for i in range(300): 
+    print(len(photoinfocut))
+ #   row = photoinfocut.iloc[i]  
+    #Where the area is not in a ca
+    print(row['georgprob'])
+    elem=row['folder']
+    Image.open(elem)
+    imshow(array(Image.open(elem)))
+    show()
