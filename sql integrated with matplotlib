@@ -1,0 +1,68 @@
+import pyodbc
+%matplotlib inline 
+import pandas as pd
+import pandas.io.sql as psql
+import sqlite3
+import matplotlib as plt
+from PIL import Image
+from pylab import *
+
+
+#Connects to the database
+con = sqlite3.connect(r'filepath')
+cur = con.cursor()
+
+
+#Sets up the size of the plot
+plt.figure(figsize=(20,40), facecolor='white')
+
+#Sets up a subplot 10 rows by 5 columns
+subplot(10,5,50)
+
+
+#Sets up an empty dataframe to hold the data
+store = pd.DataFrame(columns=['folder', 'lon', 'lat', 'georgprob'])
+
+#Sets up a set a partition of probabilities between 0 and 1 to loop through
+breaks=[0, 0.1,0.2, 0.3, 0.4, 0.5,0.6,0.7, 0.8, 0.9]
+for elem in breaks:
+    #increment the probability by 0.1 to get the upper bound of the patition
+    elemend=elem+0.1
+    #select from the database if falls with the span indicated
+    code='''SELECT * FROM Liverpoolstreetdedup WHERE georgprob >='''+str(elem)+''' AND georgprob < '''+str(elemend)+''''''
+    df =psql.read_sql(code, con)
+    #Randomly selects five rows from the data
+    a= df.iloc[np.random.randint(0, len(df), 5)]
+    #stacks it on top of the previous dataframe
+    store=verticalStack = pd.concat([store, a], axis=0)
+    
+#sorts the dataframe by georgrob and resets the index
+store=store.sort_values('georgprob', ascending=False)
+
+#Reset index as it is not meaningful as stands
+store.reset_index(drop=True)
+
+#Initalises he plotindex manually at 1 as it starts from 1 unlike python indices
+plotindex=1
+
+#Loops through the rows of the dataframe
+for i in range(store.shape[0]): 
+    #gets the filepath of the picture to show
+    picture=store['folder'].iloc[i] 
+    #indicates which subplot we mean
+    ax=plt.subplot(10,5, plotindex) 
+    #adds the title
+    ax.set_title(round(store['georgprob'].iloc[i],3))
+    #turns of the axis
+    plt.axis('off')
+    #shows the picture
+    ax.imshow(array(Image.open(picture)))
+    #increments the plotindex
+    plotindex=plotindex+1
+
+
+plt.tight_layout()
+
+#closes the connection
+con.close()  
+
