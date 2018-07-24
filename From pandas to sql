@@ -1,0 +1,36 @@
+import pandas.io.sql as psql
+import pandas as pd
+import sqlite3
+import time
+
+start_time = time.time()
+
+con = sqlite3.connect(r'filepath\\Liverpoolanalysis080618 - Copy.db')
+cur = con.cursor()
+
+#Selects the previous set of results and reads it into a data frame
+code='''SELECT * FROM Liverpoolstreetdedup'''
+df =psql.read_sql(code, con)
+
+#Starts the tensorflow session
+with tf.Session(graph=graph) as sess:
+ row_iterator = df.iterrows()
+ #Creates a blank dataframe
+ addin= pd.DataFrame(columns=['folder', 'lon', 'lat', 'georgprob', 'georgprob500'])
+ 
+ #iterates over the rows of the dataframe
+ for i, row in row_iterator:
+        #applies the function to the row['folder'] and write it to row['georgprob500']
+        row['georgprob500']=styleprob(row['folder'])
+        addin = addin.append(row)
+        #Every 100 rows commit it to the database
+        if i%100==0 and i!=0:
+          print(addin.head)
+          #prints how long it has been running
+          print("--- %s seconds ---" % (time.time() - start_time))   
+          #Adds it into the database appending to the data that is already there
+          addin.to_sql('Liverpoolstreetdedup240718', con, if_exists='append', index=False)
+          #Creates a blank dataframe to start again
+          addin=pd.DataFrame(columns=['folder', 'lon', 'lat', 'georgprob', 'georgprob500'])
+        
+con.close()
