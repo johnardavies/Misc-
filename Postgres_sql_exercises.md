@@ -75,8 +75,7 @@ ORDER BY member , recommender;    join
     WHERE fac.name LIKE 'Tennis Court%' 
     ORDER BY member , facility ASC ;
  ```
-*** How can you produce a list of bookings on the day of 2012-09-14 which will cost the member (or guest) more than 30? ***
-Remember that guests have different costs to members the listed costs are per half-hour 'slot', and the guest user is always ID 0. Include in your output the name of the facility, the name of the member formatted as a single column, and the cost. Order by descending cost, and do not use any subqueries. ***
+***How can you produce a list of bookings on the day of 2012-09-14 which will cost the member (or guest) more than 30? Remember that guests have different costs to members the listed costs are per half-hour 'slot', and the guest user is always ID 0 Include in your output the name of the facility, the name of the member formatted as a single column, and the cost. Order by descending cost, and do not use any subqueries.***
 
 ```
 
@@ -127,7 +126,7 @@ ORDER BY member;
 ```
 
 ***The Produce a list of costly bookings exercise contained some messy logic: we had to calculate the booking cost in both the WHERE clause and the CASE statement. Try to simplify this calculation using subqueries. For reference, the question was:
-How can you produce a list of bookings on the day of 2012-09-14 which will cost the member (or guest) more than $30? Remember that guests have different costs to members (the listed costs are per half-hour 'slot'), and the guest user is always ID 0. Include in your output the name of the facility, the name of the member formatted as a single column, and the cost. Order by descending cost.
+How can you produce a list of bookings on the day of 2012-09-14 which will cost the member (or guest) more than $30? Remember that guests have different costs to members (the listed costs are per half-hour 'slot'), and the guest user is always ID 0. Include in your output the name of the facility, the name of the member formatted as a single column, and the cost. Order by descending cost.***
 ***
 ```
 SELECT  member, name,cost
@@ -148,4 +147,52 @@ WHERE (CAST(starttime AS date)='2012-09-14')
 ORDER BY cost DESC ) as tam
 WHERE cost >30;
 ```
+***Produce a list of facilities along with their total revenue. The output table should consist of facility name and revenue sorted by revenue. Remember that there is a different cost for guests and members***
 
+```
+SELECT  name, sum(cost) as revenue
+FROM (
+SELECT fac.name, 
+CASE bk.memid
+WHEN 0 THEN fac.guestcost*bk.slots
+ELSE fac.membercost*bk.slots
+end as cost
+
+FROM cd.members
+	join cd.bookings bk
+	  on cd.members.memid=bk.memid
+	join cd.facilities fac
+	  on bk.facid=fac.facid
+ 
+
+) as tam
+
+GROUP BY tam.name 
+ORDER BY revenue ASC
+```
+***Produce a list of facilities with a total revenue less than 1000. Produce an output table consisting of facility name and revenue sorted by revenue. Remember that there's a different cost for guests and members.***
+```
+SELECT  name, revenue
+FROM (
+SELECT  name, sum(cost) as revenue
+FROM (
+SELECT fac.name, 
+CASE bk.memid
+WHEN 0 THEN fac.guestcost*bk.slots
+ELSE fac.membercost*bk.slots
+end as cost
+
+FROM cd.members
+	join cd.bookings bk
+	  on cd.members.memid=bk.memid
+	join cd.facilities fac
+	  on bk.facid=fac.facid
+ 
+
+) as tam
+
+GROUP BY tam.name) as tam2
+where revenue<1000
+
+ORDER BY revenue ASC;
+```
