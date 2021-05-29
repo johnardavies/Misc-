@@ -248,3 +248,27 @@ FROM cd.bookings book
 GROUP BY mem.memid
 ORDER BY rank, surname, firstname;
 ```
+***Produce a list of the top three revenue generating facilities (including ties). Output facility name and rank, sorted by rank and facility name.***
+```
+SELECT name, RANK() OVER(ORDER BY revenue DESC) rank
+  FROM (
+  SELECT  name, sum(cost) as revenue
+  FROM (
+SELECT fac.name, 
+CASE bk.memid
+WHEN 0 THEN fac.guestcost*bk.slots
+ELSE fac.membercost*bk.slots
+end as cost
+
+FROM cd.members
+	join cd.bookings bk
+	  on cd.members.memid=bk.memid
+	join cd.facilities fac
+	  on bk.facid=fac.facid
+ 
+
+  ) as tam
+
+GROUP BY tam.name) as tam2
+limit 3;
+```
