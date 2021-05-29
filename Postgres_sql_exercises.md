@@ -1,7 +1,7 @@
-##Solutions to exercies from https://pgexercises.com/##
+## Solutions to exercies from https://pgexercises.com/ ##
 
 
-***There are three tables a members table, a bookings table and a facilities table***
+***There are three tables a members table (cd.members), a bookings table (cd.bookings) and a facilities table (cd.facilities)***
 
 ***How can you produce a list of the start times for bookings by members named 'David Farrell'?***
 
@@ -127,7 +127,7 @@ ORDER BY member;
 
 ***The Produce a list of costly bookings exercise contained some messy logic: we had to calculate the booking cost in both the WHERE clause and the CASE statement. Try to simplify this calculation using subqueries. For reference, the question was:
 How can you produce a list of bookings on the day of 2012-09-14 which will cost the member (or guest) more than $30? Remember that guests have different costs to members (the listed costs are per half-hour 'slot'), and the guest user is always ID 0. Include in your output the name of the facility, the name of the member formatted as a single column, and the cost. Order by descending cost.***
-***
+
 ```
 SELECT  member, name,cost
 FROM (
@@ -148,7 +148,6 @@ ORDER BY cost DESC ) as tam
 WHERE cost >30;
 ```
 ***Produce a list of facilities along with their total revenue. The output table should consist of facility name and revenue sorted by revenue. Remember that there is a different cost for guests and members***
-
 ```
 SELECT  name, sum(cost) as revenue
 FROM (
@@ -195,4 +194,57 @@ GROUP BY tam.name) as tam2
 where revenue<1000
 
 ORDER BY revenue ASC;
+```
+***Produce a list of the total number of hours booked per facility, remembering that a slot lasts half an hour. The output table should consist of the facility id, name, and hours booked, sorted by facility id. Try formatting the hours to two decimal places.***
+```
+SELECT  bk.facid, fac.name, ROUND(sum(slots*0.5),2) as "Total Hours"
+
+FROM cd.bookings as bk
+   join cd.facilities fac
+	  on bk.facid=fac.facid
+GROUP BY  bk.facid, fac.name 
+ORDER BY bk.facid;
+```
+***Produce a list of each member name, id, and their first booking after September 1st 2012. Order by member ID.***
+
+```
+SELECT surname, firstname, mem.memid, MIN(book.starttime)
+ FROM cd.bookings as book
+    join cd.members as mem
+    on mem.memid=book.memid 
+
+  WHERE CAST(starttime AS date)>'2012-08-31'
+  GROUP BY mem.memid, mem.surname, mem.firstname
+  ORDER BY mem.memid
+```
+***Produce a list of member names, with each row containing the total member count. Order by join date, and include guest members.***
+over is used as you can have aggregated and non aggregated values in same table, unlike group
+```
+SELECT COUNT(*) over(), firstname, surname  
+ FROM cd.members
+ORDER BY joindate
+```
+***Produce a monotonically increasing numbered list of members (including guests), ordered by their date of joining. Remember that member IDs are not guaranteed to be sequential.***
+```
+SELECT  RANK() OVER(ORDER BY joindate ASC) AS row_number, firstname, surname
+FROM cd.members;
+```
+***Output the facility id that has the highest number of slots booked. Ensure that in the event of a tie, all tieing results get output.***
+```
+SELECT facid, total FROM (
+	SELECT facid, sum(slots) total, rank() OVER (ORDER BY SUM(slots) desc) rank
+        	FROM cd.bookings
+		GROUP BY facid
+	) as ranked
+	WHERE rank = 1 
+```
+
+***Produce a list of members (including guests), along with the number of hours they've booked in facilities, rounded to the nearest ten hours. Rank them by this rounded figure, producing output of first name, surname, rounded hours, rank. Sort by rank, surname, and first name.***
+```
+SELECT firstname, surname, ROUND(SUM(slots*0.5),-1) as hours, RANK() OVER(ORDER BY ROUND(SUM(slots*0.5),-1) DESC) 
+FROM cd.bookings book
+  join cd.members as mem
+      on mem.memid=book.memid
+GROUP BY mem.memid
+ORDER BY rank, surname, firstname;
 ```
