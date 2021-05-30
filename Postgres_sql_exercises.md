@@ -272,3 +272,63 @@ FROM cd.members
 GROUP BY tam.name) as tam2
 limit 3;
 ```
+***Classify facilities into equally sized groups of high, average, and low based on their revenue. Order by classification and facility name.***
+```
+SELECT name,
+/* creates the factor revenue variable */
+CASE class
+WHEN 3 THEN 'high'
+WHEN 2 THEN 'average'
+ELSE 'low'
+end as revenue
+
+FROM (
+ 
+/* Selects the name and the tertile variab;e */
+SELECT  name, NTILE(3) OVER(ORDER BY sum(cost)) as  class
+  FROM (
+SELECT fac.name, 
+/* Creates the revenue variable */
+CASE bk.memid
+WHEN 0 THEN fac.guestcost*bk.slots
+ELSE fac.membercost*bk.slots
+end as cost
+
+/* Joins the tables on the memid and the facilities ids */
+FROM cd.members
+	join cd.bookings bk
+	  on cd.members.memid=bk.memid
+	join cd.facilities fac
+	  on bk.facid=fac.facid
+ 
+  ) as table_use
+  
+  GROUP BY table_use.name
+  ) as table_use1
+  
+ /* orders by the class and the name */
+ ORDER BY class DESC, name
+```
+***Based on the 3 complete months of data so far, calculate the amount of time each facility will take to repay its cost of ownership. Remember to take into account ongoing monthly maintenance. Output facility name and payback time in months, order by facility name.***
+```
+SELECT fac.name as name, 
+
+/* Calculates the months to make back the initial outlay */
+fac.initialoutlay/((sum(
+CASE  /* the results of the CASE calculation by 3 to convert into monthly terms */
+WHEN memid=0 THEN fac.guestcost*bk.slots
+ELSE fac.membercost*bk.slots
+END )/3) - fac.monthlymaintenance) as months
+
+/* Joins the bookings table and the facilities tables */
+FROM cd.bookings bk
+	join cd.facilities fac
+	  on bk.facid=fac.facid
+				   
+/* Does the sum calculation for distinct facilities */  
+ GROUP BY fac.facid
+  
+/* orders by the name */
+ ORDER BY name
+ ```
+
