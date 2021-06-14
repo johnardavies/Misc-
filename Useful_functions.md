@@ -24,6 +24,12 @@ Truncates a timestamp at a given level e.g. DATE_TRUNC('hour', '2002-09-17 19:27
 **FLOOR(number)** \
 The FLOOR() function returns the largest integer value smaller than or equal to the number it has input
 
+**GRANT** \
+GRANT command gives specific privileges on a database object to one or more roles. 
+
+**LEAST(variable)** \
+Returns the smallest value. If there is a NULL value in the variable this will be returned
+
 **RANK() OVER (PARTITION BY partition_expression) ORDER BY sort_expression [ASC|DSC]** \
 Creates a rank variable for a given variable e.g. 1,2,3,4 etc specified by the sort_expression
 if partition is not specified then the partition is each row, otherwise the ranking is applied within the categories specified by partition_expression.
@@ -34,3 +40,9 @@ Creates a partition into number_expression values e.g. number_expression=5  then
 ORDER BY specifies the order in which the NTILE is applied e.g. ascending or descenting 
 PARTITION BY splits the rows into the  partitions into which the NTILE function is applied. This is optional
 
+**ROW_NUMBER() OVER([PARTITION BY column_1, column_2,…] [ORDER BY column_3,column_4,…])** \
+Calculate row numbers over the ORDER BY columns, Partition by is optional and will apply the row_numbering within the variables categories
+specified in the partition
+
+**TRIM(string, 'characters')** \
+Removes characters from a string if no characters removes blank spaces
